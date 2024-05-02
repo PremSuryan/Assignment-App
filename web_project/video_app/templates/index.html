@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Streaming Application</title>
+    <title>{{ video.name }}</title>
+    <style>
+        /* Body styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Page heading */
+        h1 {
+            text-align: center;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        /* Search results */
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+        }
+
+        li a {
+            color: #1320d3;
+            text-decoration: none;
+        }
+
+        /* Upload video form */
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        input[type="file"] {
+            margin-bottom: 10px;
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        /* Video details */
+        #video-details {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #video-name {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        #video-player {
+            width: 80%;
+            max-width: 800px;
+            height: auto;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <div align="center">
+    <h1 align="center">Video Streaming Application</h1>
+    <h1>{{ video.name }}</h1>
+    <div>
+        <form class="search-bar" method="post" action="{% url 'search_videos' %}">
+            {% csrf_token %}
+            <div class="form-group row" style="justify-content: center;">
+              <div class="col-sm">
+              <input name = "searchQuery" class="inputBox" type="search" placeholder="Search Videos" aria-label="Search" style="text-align: center;">
+      
+            </div>
+            <button class="form-group inputBox" type="submit">Search</button>
+              
+            </div>
+          </form>
+    <ul>
+    {% for video in videos %}
+        <li><a href="{% url 'stream_video' video.id %}">{{ video.name }}</a>  <a href ="{% url 'delete_video' video.id %}">Delete</a></li>
+        
+    {% endfor %}
+    </ul>
+    </div>
+    
+    <!-- <div id="video-list">
+        <h2 align="center">All Videos</h2>
+        <ul id="videos" align="center">
+             Video list will be populated dynamically 
+        </ul>
+    </div> -->
+
+    <div id="video-details">
+        <h2 align="center">Video Details</h2>
+        <p id="video-name" align="center"></p>
+        <!-- <video id="video-player" align="center" controls></video> -->
+        <video id="video-player" controls autoplay >
+            <!-- /videos/DragonTut.mp4 -->
+            <source src="/{{video_play}}" type="video/mp4">
+        </video>
+    </div>
+</div>
+<div>
+
+<!-- <form class = "Backpanel" method="post" enctype="multipart/form-data" action="{% url 'upload_video' %}" >
+    {% csrf_token %}
+      <label for="video">Upload Video:</label>
+      <input type="file" name="video" required>
+      <br>
+      <input type="submit" value="Upload" >
+
+  </form> -->
+  <!-- enctype="multipart/form-data"  -->
+  <h2 align="center">Upload Video</h2>
+    <form method="post" enctype="multipart/form-data" action="{% url 'upload_video' %}">
+        {% csrf_token %}
+        <div>
+            {{ form.as_p }}
+        </div>
+        
+        <div>
+            <button type="submit">Upload</button>
+        </div>
+       
+    </form>
+</div>
+    <script>
+       // Fetch videos from Django API and populate the video list
+        fetch('videoviewlist') 
+            .then(response => response.json())
+            .then(data => {
+                const videosList = document.getElementById('videos');
+                
+                data.forEach(video => {
+                console.log("fetching data...");
+                const listItem = document.createElement('li');
+                listItem.textContent = video.name;
+                listItem.addEventListener('click', () => loadVideoDetails(video));
+                videosList.appendChild(listItem);
+                });
+            });
+
+        // Function to load video details when clicked on video from list
+        function loadVideoDetails(video) {
+            console.log("video is loading...")
+            document.getElementById('video-name').textContent = video.name;
+            const videoPlayer = document.getElementById('video-player');
+            videoPlayer.src = video.video_url;
+            videoPlayer.load();
+        }
+
+        // Function to delete video
+        var proxyDelete = document.getElementById('proxyDelete');
+        console.log('button clicked :', proxyDelete);
+        function proxyDel(event){
+          console.log('event triggered :', proxyDelete);
+          var isConfirmed = window.confirm("Are you sure you want to delete?");
+          if (isConfirmed){
+            
+            delbutton.click();
+            alert("Thunder deleted!");
+
+          }
+          else {
+            alert("Thunder not willing to Delete")
+            //event.preventDefault();
+          };
+        };
+    </script>
+</body>
+</html>
